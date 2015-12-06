@@ -15,6 +15,13 @@ class Robot:
                 n_occu, n_unoccu = Robot._occupied_find(normal, self.game)
                 if n_unoccu:
                     return ["move", rg.toward(self.location, n_unoccu[0])]
+                else:
+                    for i in n_occu:
+                        friend_test = Robot._test_friend_bot(self.player_id, i, self.game)
+                        if friend_test == "friend":
+                            pass
+                        else:
+                            return ["attack", i]
             if spawn:
                 s_occu, s_unoccu = Robot._occupied_find(spawn, self.game)
                 if s_unoccu:
@@ -97,9 +104,9 @@ class Robot:
         """
         bot_player_id = game.robots[loc]['player_id']
         if bot_player_id == my_player_id:
-            return "enemy"
-        else:
             return "friend"
+        else:
+            return "enemy"
 
 
         # if self.location == rg.CENTER_POINT
