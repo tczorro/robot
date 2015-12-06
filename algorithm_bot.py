@@ -24,6 +24,15 @@ class Robot:
 
     @staticmethod
     def _spawn_test(location):
+        """test input location is at spawn place or not
+        
+        Args:
+            location (tuple): location of the map
+        
+        Returns:
+            bool: True if the place is a spawnplace
+                  False if not
+        """
         spot = rg.loc_types(location)
         if ("spawn") in spot:
             return True
@@ -32,6 +41,15 @@ class Robot:
 
     @staticmethod
     def _surrounding(location):
+        """test closest place location and property
+        
+        Args:
+            location (tuple): location of the map
+        
+        Returns:
+            tuple: return[0], list, a list of location of normal places
+                   return[1], list, a list of location of spawn places
+        """
         normal = rg.locs_around(location, filter_out=('invalid', 'obstacle', 'spawn'))
         spawn = rg.locs_around(location, filter_out=('invalid', 'obstacle'))
         for i in spawn:
@@ -41,6 +59,16 @@ class Robot:
 
     @staticmethod
     def _occupied_find(locs, game):
+        """test given location is occupied by a bot or not
+        
+        Args:
+            locs (tuple): location of a map
+            game (a information type of rg): information for present map
+        
+        Returns:
+            tuple: return[0], list, a list of location been occupied
+                   return[1], list, a list of location haven't been oocupied
+        """
         occupied = []
         unoccupied = []
         loc_len = len(locs)
@@ -56,6 +84,17 @@ class Robot:
 
     @staticmethod
     def _test_friend_bot(my_player_id, loc, game):
+        """test a bot on a location is a friendly one or not
+
+        Args:
+            my_player_id (attribute of bot object): an id to tell which player
+            loc (tuple): location of the game
+            game (game info): a game info data structure
+        
+        Returns:
+            string: 'friend' for a friend bot
+                    'enemy' for a enemy bot
+        """
         bot_player_id = game.robots[loc]['player_id']
         if bot_player_id == my_player_id:
             return "enemy"
