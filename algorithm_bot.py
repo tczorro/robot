@@ -3,14 +3,45 @@ class Robot:
     def act(self, game):
         self.game = game
         spawn_test = self._spawn_action()
+        # if game.turn == 1:
+        #     for i in range(19):
+        #         for j in range(19):
+        #             spot = rg.loc_types((i,j))
+        #             print "i:",i, "j:",j,"spot", spot
+
         if spawn_test:
             return spawn_test
+        next_step = self._near_spawn_action()
+        if next_step:
+            return next_step
         return ["guard"]
+
+    def _near_spawn_action(self):
+        normal, spawn = Robot._surrounding(self.location)
+        if spawn:
+            s_occu, s_unoccu = Robot._occupied_find(spawn, self.game)
+            if s_occu:
+                for i in s_occu:
+                    friend_test = Robot._test_friend_bot(self.player_id, i, self.game)
+                    if friend_test == "friend":
+                        return ["move", rg.toward(self.location, rg.CENTER_POINT)]
+                    else:
+                        return ["attack", i]
+        if normal:
+            o_occu, o_unoccu = Robot._occupied_find(normal, self.game)
+            if o_occu:
+                for i in o_occu:
+                    friend_test = Robot._test_friend_bot(self.player_id, i, self.game)
+                    if friend_test == "friend":
+                        continue
+                    return ["attack", i]
+        return ['guard']
+
+
 
     def _spawn_action(self):
         if Robot._spawn_test(self.location):
             normal, spawn = Robot._surrounding(self.location)
-            print normal, spawn
             if normal:
                 n_occu, n_unoccu = Robot._occupied_find(normal, self.game)
                 if n_unoccu:
@@ -59,10 +90,10 @@ class Robot:
         """
         normal = rg.locs_around(location, filter_out=('invalid', 'obstacle', 'spawn'))
         spawn = rg.locs_around(location, filter_out=('invalid', 'obstacle'))
-        for i in spawn:
-            if i in normal:
-                spawn.remove(i)
-        return normal, spawn
+        new_spawn = [val for val in spawn if val not in normal]
+        # intersection = [val for val in normal if val in new_spawn]
+        # print "intersection", intersection
+        return normal, new_spawn
 
     @staticmethod
     def _occupied_find(locs, game):
